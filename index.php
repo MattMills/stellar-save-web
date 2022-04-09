@@ -1,16 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8">
-	<title>Read a zip file (demo zip.js)</title>
-	<meta name="viewport" content="width=device-width">
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-</head>
-
-<body>
+<?php
+	$this_page = 'saves';
+	require_once('../stellar-web/header.php');
+?>
 	<div id="container" class="container-fluid" style="width:80%">
 		<div class="container row">
-		<h2>StellarStellaris Save editor (EARLY DEVELOPMENT)</h2>
+		<h2>(EARLY DEVELOPMENT)</h2>
 		Click open to select save file, or drag and drop save file (NOT IMPLEMENTED YET) to begin editing.<br />
 		</div>
 		<div class="row">&nbsp;</div>
@@ -170,11 +164,10 @@
 	</div>
 	<script type="text/javascript" src="lib/zip.js/dist/zip.min.js"></script>
 	<script type="text/javascript" src="lib/zip.js/dist/z-worker.js"></script>
-        <script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous"></script>
-	<script src="//cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 	<script type="text/javascript" src="zip-local.js"></script>
 	<script type="text/javascript" src="ui-updates.js"></script>
 	<script type="text/javascript" src="stellaris-parse-worker.js"></script>
-</body>
+<?php
 
-</html>
+	require_once('../stellar-web/footer.php');
+?>
