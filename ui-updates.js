@@ -10,6 +10,13 @@ async function updateProgressParse1(index, max){
 	console.log("Parse1 progress: " + index + " / " + max);
 	progress_bar.text("Parse stage 1: " + index + " / " + max);
 }
+async function updateProgressParse2(index, max){
+	        const progress_bar = $('#progress-parse-2');
+	        progress_bar.width(index/max*100 +'%');
+	        console.log("Parse2 progress: " + index + " / " + max);
+	        progress_bar.text("Parse stage 2: " + index + " / " + max);
+}
+
 async function updateSaveSize(size){
 	const element = $('#save-size');
 	element.text((size/1024/1024).toFixed(2)+ " MB")
@@ -66,8 +73,61 @@ async function updateUIPostLoad(){
 	$('#save-last_killed_country_name')	.text(stripQuotes(gamestate_parts['last_killed_country_name']));
 
 	$('#save-dlc-pre').text(gamestate_parts['required_dlcs']);
-	$('#save-country-pre').text(gamestate_parts['country']);
+	updateUICountries()
 	$('#save-species-pre').text(gamestate_parts['species_db']);
 	$('#save-diplomacy-pre').text(gamestate_parts['war']);
 }
 
+function updateUICountries(){
+	/*
+	<th>ID</th>
+	<th>Flag</th>
+	<th>Name</th>
+	<th>Power (Econ/Mil/Tech)</th>
+	<th>Score</th>
+	<th>Rank</th>
+	<th>Size</th>
+	<th>Pops</th>
+	<th>Government</th>
+	<th>Origin</th>
+	<th>Starbases</th>
+	*/
+	//TODO: Clear any rows for double load
+
+	countries = gamestate_parts_s2['country'][0][0];
+
+	for(let key in countries){
+		if(key.substring(0,2) == '__'){
+			continue;
+		}
+		if(countries[key] == "none"){
+			continue;
+		}
+		var sub_key = key.substring(4);
+		countries[key]['economy_power'] = Math.round(countries[key]['economy_power'])
+		countries[key]['military_power'] = Math.round(countries[key]['military_power'])
+		countries[key]['tech_power'] = Math.round(countries[key]['tech_power'])
+		countries[key]['victory_score'] = Math.round(countries[key]['victory_score'])
+		
+		$('#save-country-table > tbody:last-child').append(`
+		<tr>
+			<td>${sub_key}</td>
+			<td>&nbsp;</td>
+			<td>${countries[key]['name']}</td>
+			<td>${countries[key]['economy_power']}</td>
+			<td>${countries[key]['military_power']}</td>
+			<td>${countries[key]['tech_power']}</td>
+			<td>${countries[key]['victory_score']}</td>
+			<td>${countries[key]['victory_rank']}</td>
+			<td>${countries[key]['empire_size']}</td>
+			<td>${countries[key]['sapient']}</td>
+			<td>&nbsp;</td>
+			<td></td>
+			<td>${countries[key]['num_upgraded_starbase']} / ${countries[key]['starbase_capacity']}</td>
+		</tr>`)
+	}
+		
+		
+	
+
+}

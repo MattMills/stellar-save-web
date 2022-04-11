@@ -1,6 +1,7 @@
 	var meta_text = null;
 	var gamestate_text = null;
 	var gamestate_parts = [];
+	
 	var gamestate_parts_s2 = [];
 	var open = 0;
 	var max_depth = 0;
@@ -92,11 +93,10 @@
 			updateSaveParts(part_count);
 			updateSaveMaxRecursion(max_depth);
 
-
+			parseStage2();
 
 			end_parse_time = new Date().getTime();
 			updateSaveLoadTime(start_parse_time, end_parse_time);
-
 			updateUIPostLoad();
 			$('#progress-modal').modal('hide');
 
@@ -128,5 +128,173 @@
 		}
 
 		gamestate_parts[part_name].push(part_value);
-		addSavePart(part_name, part_value); // UI
+		//addSavePart(part_name, part_value); // UI
 	}
+
+	function parseStage2(){
+		var max = Object.keys(gamestate_parts).length
+		updateProgressParse2(0, max);
+
+		var i = 0;
+		
+		Object.keys(gamestate_parts).forEach((element, index) => {
+			gamestate_parts_s2[element] = []
+			gamestate_parts[element].forEach((element2,index2) => {
+				console.log("Parse2: " + element + " " + index2)
+				gamestate_parts_s2[element][index2] = parseStage2SinglePart(element2)
+			});
+			
+			i++;
+			updateProgressParse2(i, max);
+		});
+	}
+
+
+	function parseStage2SinglePart(part_text){
+
+		var return_array = []
+		var current_array = return_array
+
+		var left = ""			//Left side of an =
+		var string_value = ""		//inside of ""
+		var numeric_value = ""		//Numeric value, [0-9\.-]
+		var in_assignment = false	//we're on the right side of an assignment, left should contain name
+		var in_string  = false		//we're parsing a string ("")
+		var in_numeric = false		//we're parsing a numeric
+		var is_whitespace = false
+
+
+		for( var i = 0; i < part_text.length ; i++){
+			current_char = part_text[i];
+			if(current_char == '\n' || current_char == '\t' || current_char == ' '){
+				is_whitespace = true
+			}else{
+				is_whitespace = false
+			}
+
+			if(current_char == '=' ){
+				in_assignment = true
+				left = left.trim()
+				if(!isNaN(left)){
+					left = 'STR_' + left
+				}else if(left == 'length'){
+					//length is special key
+					left == 'STR_length'
+				}
+
+			}else if( current_char == '"'){
+				in_string = true
+				var start_i = i
+
+				string_value = ""
+				i++ //first character is ", move past.
+
+				for( ; part_text[i] != '"' && i-start_i<1024; i++){
+					try{
+						string_value += part_text[i]
+					}catch{
+						console.log('Parse2 failure in string parsing: length limit 1024')
+						break
+					}
+				}
+
+				if(in_assignment){
+					if(left == ""){ 
+						left = "__EMPTY__STRING__"
+						console.log("Parse2 Error empty string assignment, " + i )
+					}
+					current_array[left] = string_value
+					in_assignment = false
+					left = ""
+				}else{
+					current_array.push(string_value)
+				}
+
+				in_string = false
+			}else if(in_assignment && !is_whitespace && (current_char == '-' || !isNaN(current_char))){
+				in_numeric = true
+				numeric_value = part_text[i]
+				i++
+				
+				for( ; (!isNaN(part_text[i]) || part_text[i] == '.') && part_text[i] != '\n' && part_text[i] != '\t' && part_text[i] != ' ' ; i++){
+					//Apparently in javascript whitespace  == 0
+					numeric_value += part_text[i]
+				}
+				if(in_assignment && left != ""){
+					try{
+						current_array[left] = numeric_value
+					}catch{
+						console.log("Parse2 Error in Numeric assignment: Unable to assign /" + left + "/ value=" + numeric_value)
+						console.log(current_array)
+					}
+					in_assignment = false
+					left = ""
+				}else{
+					current_array.push(numeric_value)
+				}
+
+				in_numeric = false
+			}else if( current_char == '{' ){
+				if(in_assignment){
+					current_array[left] = []
+					current_array[left]['__PARENT__'] = current_array
+					current_array = current_array[left]
+					current_array['__START__'] = i
+					left = ""
+					in_assignment = false
+				}else{
+					new_array = []
+					new_array['__PARENT__'] = current_array
+					new_array['__START__'] = i
+					current_array.push(new_array)
+					current_array = new_array
+				}
+
+			}else if( current_char == '}' ){
+				var temp_array = current_array['__PARENT__']
+				current_array['__END__'] = i
+				delete current_array['__PARENT__']
+				current_array = temp_array
+			}else if( is_whitespace){ //Ignore all whitespace
+				if(in_assignment && in_string){
+	                                current_array[left] = string_value
+	                                in_assignment = false         
+	                                left = ""
+		                        string_value = ""
+				}else if(!in_assignment && left != ""){
+					current_array.push(left)
+					left = ""
+				}
+			}else if(!in_assignment){
+				left += current_char
+			}else if(in_assignment){
+				if(in_string ==  false){
+					in_string = true
+					string_value = ''
+				}
+				string_value += current_char
+			}
+		}
+
+		return return_array;
+	}
+
+var test = `
+	0={
+		flag={
+			icon={
+				category="zoological"
+				file="flag_zoological_19.dds"
+			}
+			background={
+				category="backgrounds"
+				file="diagonal.dds"
+			}
+			colors={
+				"burgundy"
+				"black"
+				"black"
+				"null"
+			}
+		}
+    }`;

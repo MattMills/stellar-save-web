@@ -129,7 +129,23 @@
 				<pre id="save-dlc-pre"></pre>
 			</div>
 			<div class="tab-pane fade" id="save-country" role="tabpanel">
-				<pre id="save-country-pre"></pre>
+				<table class="table" id="save-country-table">
+					<tr>
+						<th>ID</th>
+						<th>Flag</th>
+						<th>Name</th>
+						<th>Econ</th>
+						<th>Mil</th>
+						<th>Tech</th>
+						<th>Score</th>
+						<th>Rank</th>
+						<th>Size</th>
+						<th>Pops</th>
+						<th>Government</th>
+						<th>Origin</th>
+						<th>Starbases</th>
+					</tr>
+				</table>
 			</div>
 			<div class="tab-pane fade" id="save-species" role="tabpanel">
 				<pre id="save-species-pre"></pre>
@@ -158,6 +174,9 @@
 					<div class="progress">
 					        <div id="progress-parse-1" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
 					</div>
+					<div class="progress">
+                                                <div id="progress-parse-2" class="progress-bar" role="progressbar" style="width: 90%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">Making this progress bar work takes more thinking</div>
+                                        </div>
 				</div>
 			</div>
 		</div>
